@@ -91,6 +91,7 @@ module.exports = async (Component, opts = {}) => {
   const browser = await puppeteer.launch(puppeteerOptions)
   const page = await browser.newPage()
   await page.goto(data)
+  await page.setViewport({ width: 1920, height: 1080 });
   const result = await page.screenshot({
     type: 'png',
     clip: {
