@@ -88,21 +88,60 @@ module.exports = async (Component, opts = {}) => {
     webfont
   })
 
+    // measuring time in each part of the screenshot creation process
+
+  // open browser
+  const openBrowserStartTime = process.hrtime()
   const browser = await puppeteer.launch(puppeteerOptions)
+  const openBrowserEndTime = process.hrtime(openBrowserStartTime)
+  console.log(`Open Browser execution time: ${openBrowserEndTime[1]/1000000} ms`)
+  
+  // open new browser page
+  const pagebrowserStartTime = process.hrtime()
   const page = await browser.newPage()
+  const pagebrowserEndTime = process.hrtime(pagebrowserStartTime)
+  console.log(`Open browser page execution time: ${pagebrowserEndTime[1]/1000000} ms`)
+
+  // pass data to browser page
+  const dataPassStartTime = process.hrtime()
   await page.goto(data)
-  await page.setViewport({ width: 1920, height: 1080 });
+  const datapassEndTime = process.hrtime(dataPassStartTime)
+  console.log(`Pass data to page execution time: ${datapassEndTime[1]/1000000} ms`)
+
+  // set page viewport
+  const setPageViewPortStartTime = process.hrtime()
+  await page.setViewport({ width: parseInt(width) * scale, height: parseInt(height) * scale })
+  const setPageViewPortEndTime = process.hrtime(setPageViewPortStartTime)
+  console.log(`Set page viewport execution time: ${setPageViewPortEndTime[1]/1000000} ms`)
+  
+  // probando: escalamiento de pagina para acelerar toma  del screenshot 
+  await page.evaluate(function(factor) {
+    var root = document.querySelector('html')
+  
+    root.style.transform='scale(' + factor + ')'
+    root.style.transformOrigin='top left'
+  }, scale)
+
+  // generate screenshoot
+  const generateScreenShootStartTime = process.hrtime()
   const result = await page.screenshot({
     type: 'png',
     clip: {
       x: 0,
       y: 0,
-      width: parseInt(width),
-      height: parseInt(height)
+      width: parseInt(width) * scale,
+      height: parseInt(height) * scale
     },
     omitBackground: true
   })
+  const generateScreenShootEndTime = process.hrtime(generateScreenShootStartTime);
+  console.log(`Generate Screenshoot execution time: ${generateScreenShootEndTime[1]/1000000} ms`)
+
+  // close browser
+  const browserCloseStartTime = process.hrtime()
   await browser.close()
+  const browserCloseEndTime = process.hrtime(browserCloseStartTime)
+  console.log(`Browser close execution time: ${browserCloseEndTime[1]/1000000} ms`)
 
   return result
 }

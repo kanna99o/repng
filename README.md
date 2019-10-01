@@ -21,6 +21,7 @@ Options
   -f --filename   Specify a custom output filename
   -w --width      Width of image
   -h --height     Height of image
+  -s --scale      Scale factor of the image
   -p --props      Props in JSON format to pass to the React component
   -u --puppeteer  Props in JSON format to pass to `puppeteer.launch`
   --css           Path to CSS file to include
